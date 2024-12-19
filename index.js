@@ -15,8 +15,7 @@ function gerarFaturaStr (fatura, pecas) {
     function formatarMoeda(valor) {
       return new Intl.NumberFormat("pt-BR",
         { style: "currency", currency: "BRL",
-          //tomei a liberdade de remover o parametro valor/100 de format
-          minimumFractionDigits: 2 }).format(valor);
+          minimumFractionDigits: 2 }).format(valor/100)
     }
 
     const formato = formatarMoeda;
@@ -60,13 +59,23 @@ function gerarFaturaStr (fatura, pecas) {
 
       creditos += calcularCredito(apre);
   
-      // mais uma linha da fatura
-      faturaStr += `  ${getPeca(apre).nome}: ${formato(total/100)} (${apre.audiencia} assentos)\n`;
       totalFatura += total;
     }
-    faturaStr += `Valor total: ${formato(totalFatura/100)}\n`;
-    faturaStr += `Créditos acumulados: ${creditos} \n`;
+    //////////////////
+    function calcularTotalFatura(){
+      return totalFatura;
+    }
+    function calcularTotalCreditos(){
+      return creditos;
+    }
+
+    for (let apre of fatura.apresentacoes) {
+        faturaStr += `  ${getPeca(apre).nome}: ${formatarMoeda(calcularTotalApresentacao(apre))} (${apre.audiencia} assentos)\n`;
+    }
+    faturaStr += `Valor total: ${formatarMoeda(calcularTotalFatura())}\n`;
+    faturaStr += `Créditos acumulados: ${calcularTotalCreditos()} \n`;
     return faturaStr;
+    /////////////////
   }
 
 const faturas = JSON.parse(readFileSync('./faturas.json'));
